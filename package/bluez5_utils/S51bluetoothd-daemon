@@ -1,0 +1,50 @@
+#!/bin/sh
+#
+# Start bluetoohd
+#
+
+start() {
+        hciattach /dev/ttyAMA0 bcm43xx 115200 noflow -
+        hciconfig hci0 up
+        printf "Starting bluetoohd: "
+        if /etc/knot/start.sh bluetoohd -n
+        then
+          echo "OK"
+        else
+          echo "FAIL"
+        fi
+}
+
+stop() {
+        hciconfig hci0 down
+        printf "Stopping bluetoohd: "
+        if /etc/knot/stop.sh bluetoohd
+        then
+          echo "OK"
+        else
+          echo "FAIL"
+        fi
+}
+
+restart() {
+        stop
+        start
+}
+
+
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  restart|reload)
+	restart
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+esac
+
+exit $?
